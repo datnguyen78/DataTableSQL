@@ -1,0 +1,83 @@
+-- Insert sample data for ProductGroup
+INSERT INTO ProductGroup (GroupID, GroupName, ProductType) VALUES
+(1, 'Arcade Machines', 'Gaming'),
+(2, 'VR Games', 'Gaming'),
+(3, 'Pinball Machines', 'Gaming');
+
+-- Insert sample data for Product
+INSERT INTO Product (ProductID, GroupID, Name, Units, PricePerUnit) VALUES
+(1, 1, 'Air Hockey Table', 'Pieces', 1500.00),
+(2, 1, 'Basketball Arcade Machine', 'Pieces', 2500.00),
+(3, 2, 'VR Headset', 'Pieces', 500.00);
+
+-- Insert sample data for Supplier
+INSERT INTO Supplier (SupplierID, SupplierName, ContactInfo) VALUES
+(1, 'Gaming Suppliers Ltd.', '123-456-7890'),
+(2, 'Arcade Essentials', '987-654-3210');
+
+-- Insert sample data for Staff
+INSERT INTO Staff (StaffID, FirstName, LastName, IDCardNumber, ContactNumber, Role, EmploymentType) VALUES
+(1, 'John', 'Doe', 'ID123456', '111-222-3333', 'Manager', 'Full-Time'),
+(2, 'Jane', 'Smith', 'ID654321', '444-555-6666', 'Cashier', 'Part-Time');
+
+-- Insert sample data for Customer
+INSERT INTO Customer (CustomerID, FirstName, LastName, ContactNumber) VALUES
+(1, 'Alice', 'Brown', '777-888-9999'),
+(2, 'Bob', 'Johnson', '333-444-5555');
+
+-- Insert sample data for CustomerCard
+INSERT INTO CustomerCard (CardID, CustomerID, Balance, Tickets, IssueDate, ExpiryDate, Status) VALUES
+(1, 1, 100.00, 50, '2024-01-01', '2025-01-01', 'Active'),
+(2, 2, 50.00, 20, '2024-01-10', '2025-01-10', 'Active');
+
+-- Insert sample data for StockReceipt
+INSERT INTO StockReceipt (ReceiptID, StaffID, SupplierID, ReceiptDate, TotalAmount) VALUES
+(1, 1, 1, '2024-02-01', 5000.00),
+(2, 1, 2, '2024-02-05', 3000.00);
+
+-- Insert sample data for StockReceiptDetail
+INSERT INTO StockReceiptDetail (DetailID, ProductID, ReceiptID, Quantity, UnitPrice) VALUES
+(1, 1, 1, 2, 1500.00),
+(2, 2, 2, 1, 2500.00);
+
+-- Insert sample data for GameMachine
+INSERT INTO GameMachine (GameMachineID, GameType, GameName, CostPerPlay, GameLocation, Status) VALUES
+(1, 'Arcade', 'Pac-Man', 1.00, 'Zone A', 'Active'),
+(2, 'VR', 'VR Racing', 2.00, 'Zone B', 'Active');
+
+-- Insert sample data for StockCompensationReceipt
+INSERT INTO StockCompensationReceipt (CompensationID, IssuedBy, ApprovedBy, GameMachineID, TimeIssued, DateIssued, Reason) VALUES
+(1, 1, 1, 1, '10:00:00', '2024-02-10', 'Machine repair');
+
+-- Insert sample data for PaymentReceipt
+INSERT INTO PaymentReceipt (PaymentID, SupplierID, StaffID, Amount, PaymentTime, PaymentDate) VALUES
+(1, 1, 1, 5000.00, '14:00:00', '2024-02-12');
+
+-- Insert sample data for Maintenance
+INSERT INTO Maintenance (MaintenanceID, GameMachineID, StaffID, Time, Date, TotalCost) VALUES
+(1, 1, 1, '15:00:00', '2024-02-15', 100.00);
+
+-- Insert sample data for MaintenanceDetail
+INSERT INTO MaintenanceDetail (DetailID, MaintenanceID, Description, DetailedCost) VALUES
+(1, 1, 'Replaced joystick', 50.00);
+
+-- Insert sample data for Gift
+INSERT INTO Gift (GiftID, GiftName, TicketsCost, Stock) VALUES
+(1, 'Stuffed Toy', 30, 100),
+(2, 'Mini Car', 50, 50);
+
+-- Insert sample data for GiftRedemption
+INSERT INTO GiftRedemption (RedemptionID, GiftID, CardID, StaffID, TicketsDeducted, Time, Date) VALUES
+(1, 1, 1, 2, 30, '16:00:00', '2024-02-20');
+
+-- Insert sample data for DepositTransaction
+INSERT INTO DepositTransaction (DepositID, CustomerCardID, CashierID, AmountDeposited, Time, Date) VALUES
+(1, 1, 2, 20.00, '17:00:00', '2024-02-22');
+
+-- Insert sample data for GameTransaction
+INSERT INTO GameTransaction (GameTransactionID, GameMachineID, CardID, AmountDeducted, TicketsEarned, DiscountApplied, StartTime, EndTime, Date) VALUES
+(1, 1, 1, 1.00, 5, 0, '18:00:00', '18:05:00', '2024-02-25');
+
+-- Insert sample data for CardDiscount
+INSERT INTO CardDiscount (CardTypeID, CardID, CardName, DiscountPercentage) VALUES
+(1, 1, 'VIP Card', 10.00);
