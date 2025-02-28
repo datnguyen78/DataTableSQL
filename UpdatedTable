@@ -190,3 +190,14 @@ CREATE TABLE GameTransaction (
     FOREIGN KEY (GameMachineID) REFERENCES GameMachine(GameMachineID),
     FOREIGN KEY (CardID) REFERENCES CustomerCard(CardID)
 );
+
+-- Tạo bảng GameOperatorAssignment
+CREATE TABLE GameOperatorAssignment (
+    AssignmentID INT PRIMARY KEY,
+    GameMachineID INT NOT NULL,
+    StaffID INT NOT NULL,
+    Time TIME NOT NULL,
+    Date DATE NOT NULL,
+    FOREIGN KEY (GameMachineID) REFERENCES GameMachine(GameMachineID),
+    FOREIGN KEY (StaffID) REFERENCES Staff(StaffID)
+);
