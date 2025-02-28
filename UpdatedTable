@@ -201,3 +201,10 @@ CREATE TABLE GameOperatorAssignment (
     FOREIGN KEY (GameMachineID) REFERENCES GameMachine(GameMachineID),
     FOREIGN KEY (StaffID) REFERENCES Staff(StaffID)
 );
+CREATE TABLE CardDiscount (
+    CardTypeID INT PRIMARY KEY,
+    CardID INT NOT NULL,
+    CardName NVARCHAR(50) NOT NULL,
+    DiscountPercentage DECIMAL(5,2) NOT NULL CHECK (DiscountPercentage >= 0 AND DiscountPercentage <= 100),
+    FOREIGN KEY (CardID) REFERENCES CustomerCard(CardID)
+);
