@@ -17,3 +17,24 @@ FROM sys.tables;
 
 EXEC sp_executesql @sql;
 
+-- Delete all Data
+DELETE FROM CardDiscount;
+DELETE FROM GameTransaction;
+DELETE FROM DepositTransaction;
+DELETE FROM GiftRedemption;
+DELETE FROM Gift;
+DELETE FROM MaintenanceDetail;
+DELETE FROM Maintenance;
+DELETE FROM PaymentReceipt;
+DELETE FROM StockCompensationReceipt;
+DELETE FROM GameMachine;
+DELETE FROM StockReceiptDetail;
+DELETE FROM StockReceipt;
+DELETE FROM CustomerCard;
+DELETE FROM Customer;
+DELETE FROM Staff;
+DELETE FROM Supplier;
+DELETE FROM Product;
+DELETE FROM ProductGroup;
+DELETE FROM CardDiscount;
+DELETE FROM GameOperatorAssignment;
