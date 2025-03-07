@@ -30,7 +30,8 @@ CREATE TABLE Staff (
     IDCardNumber NVARCHAR(20) UNIQUE NOT NULL,
     ContactNumber NVARCHAR(20) NOT NULL,
     Role NVARCHAR(50) NOT NULL,
-    EmploymentType NVARCHAR(50) NOT NULL
+    EmploymentType NVARCHAR(50) NOT NULL,
+    ROLEID
 );
 
 -- Tạo bảng Customer
