@@ -208,3 +208,9 @@ CREATE TABLE CardDiscount (
     DiscountPercentage DECIMAL(5,2) NOT NULL CHECK (DiscountPercentage >= 0 AND DiscountPercentage <= 100),
     FOREIGN KEY (CardID) REFERENCES CustomerCard(CardID)
 );
+CREATE TABLE Roles (
+    RoleID INT NOT NULL PRIMARY KEY,
+    RoleName NVARCHAR(50) NOT NULL,
+    CONSTRAINT UQ_RoleName UNIQUE (RoleName)
+);
+
