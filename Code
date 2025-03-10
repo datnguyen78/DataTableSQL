@@ -1,95 +1,37 @@
--- DROP FUNCTION GetRevenueReport;
-ALTER FUNCTION [dbo].[GetRevenueReport](
-    @StartDate DATE,
-    @EndDate DATE,
-    @CustomerID INT = NULL, 
-    @CashierID INT = NULL
-)
+ALTER FUNCTION [dbo].[GetFullRevenueReport](@StartDate DATETIME = NULL, @EndDate DATETIME = NULL)
 RETURNS TABLE
 AS
 RETURN
 (
     SELECT 
-        dt.Date AS TransactionDate,
-        c.CustomerID,
-        CONCAT(c.FirstName, ' ', c.LastName) AS CustomerName,
-        s.StaffID AS CashierID,
-        CONCAT(s.FirstName, ' ', s.LastName) AS CashierName,
-        SUM(dt.AmountDeposited) AS TotalDeposit,
-        SUM(gt.AmountDeducted) AS TotalSpent
-    FROM DepositTransaction dt
-    LEFT JOIN GameTransaction gt ON dt.CustomerCardID = gt.CardID AND dt.Date = gt.Date
-    LEFT JOIN CustomerCard cc ON dt.CustomerCardID = cc.CardID
-    LEFT JOIN Customer c ON cc.CustomerID = c.CustomerID
-    LEFT JOIN Staff s ON dt.CashierID = s.StaffID
-    WHERE dt.Date BETWEEN @StartDate AND @EndDate
-        AND (@CustomerID IS NULL OR c.CustomerID = @CustomerID)
-        AND (@CashierID IS NULL OR s.StaffID = @CashierID)
-    GROUP BY dt.Date, c.CustomerID, c.FirstName, c.LastName, s.StaffID, s.FirstName, s.LastName
+        GameMachine.GameMachineID, 
+        GameMachine.GameName, 
+        CONCAT(Customer.FirstName, ' ', Customer.LastName) AS CustomerName,
+        Customer.CustomerID,
+        ISNULL(SUM(DepositTransaction.AmountDeposited), 0) AS TotalDeposit,
+        ISNULL(SUM(GameTransaction.AmountDeducted), 0) AS TotalSpent,
+        ISNULL(SUM(DepositTransaction.AmountDeposited) - SUM(GameTransaction.AmountDeducted), 0) AS TotalRevenue,
+        DepositTransaction.Date AS DepositDate,
+        DepositTransaction.Time AS DepositTime,
+        GameTransaction.Date AS PlayDate,
+        GameTransaction.StartTime AS PlayTime
+    FROM Customer
+    LEFT JOIN CustomerCard ON Customer.CustomerID = CustomerCard.CustomerID
+    LEFT JOIN DepositTransaction ON CustomerCard.CardID = DepositTransaction.CustomerCardID
+    LEFT JOIN GameTransaction ON CustomerCard.CardID = GameTransaction.CardID
+    LEFT JOIN GameMachine ON GameTransaction.GameMachineID = GameMachine.GameMachineID
+    WHERE 
+        (@StartDate IS NULL OR @EndDate IS NULL) 
+        OR (DepositTransaction.Date BETWEEN @StartDate AND @EndDate) 
+        OR (GameTransaction.Date BETWEEN @StartDate AND @EndDate)
+    GROUP BY 
+        GameMachine.GameMachineID, 
+        GameMachine.GameName, 
+        Customer.CustomerID, 
+        Customer.FirstName, 
+        Customer.LastName, 
+        DepositTransaction.Date, 
+        DepositTransaction.Time, 
+        GameTransaction.Date, 
+        GameTransaction.StartTime
 );
-
--- SELECT * FROM GetRevenueReport('2024-01-01', '2024-01-31', NULL, NULL);
-
-USE [game_center]
-GO
-/****** Object:  UserDefinedFunction [dbo].[GetRevenueByMachine]    Script Date: 3/10/2025 2:57:48 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-ALTER FUNCTION [dbo].[GetRevenueByMachine]()
-RETURNS TABLE
-AS
-RETURN 
-(
-    SELECT 
-        gm.GameMachineID, 
-        gm.GameName, 
-        gm.GameLocation,
-        COUNT(gt.GameTransactionID) AS TotalPlays,  -- Number of times the machine was used
-        SUM(gt.AmountDeducted) AS TotalRevenue     -- Total revenue generated
-    FROM GameTransaction gt
-    INNER JOIN GameMachine gm ON gt.GameMachineID = gm.GameMachineID
-    GROUP BY gm.GameMachineID, gm.GameName, gm.GameLocation
-);
-USE [game_center]
-GO
-/****** Object:  UserDefinedFunction [dbo].[GetRevenueByDate]    Script Date: 3/10/2025 2:58:03 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-ALTER FUNCTION [dbo].[GetRevenueByDate]()
-RETURNS TABLE
-AS
-RETURN 
-(
-    SELECT 
-        gt.Date AS TransactionDate,
-        COUNT(gt.GameTransactionID) AS TotalPlays,   -- Number of transactions per date
-        SUM(gt.AmountDeducted) AS TotalRevenue      -- Total revenue generated per date
-    FROM GameTransaction gt
-    GROUP BY gt.Date
-);
-USE [game_center]
-GO
-/****** Object:  UserDefinedFunction [dbo].[GetRevenueByStaff]    Script Date: 3/10/2025 2:58:20 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-ALTER FUNCTION [dbo].[GetRevenueByStaff]()
-RETURNS TABLE
-AS
-RETURN 
-(
-    SELECT 
-        s.StaffID,
-        CONCAT(s.FirstName, ' ', s.LastName) AS FullName,
-        SUM(dt.AmountDeposited) AS TotalRevenue
-    FROM Staff s
-    INNER JOIN DepositTransaction dt ON s.StaffID = dt.CashierID
-    GROUP BY s.StaffID, s.FirstName, s.LastName
-);
--- SELECT * FROM dbo.GetRevenueByStaff() WHERE StaffID = 1; SELECT * FROM dbo.GetStaffDepositTransactions() WHERE StaffID = 1;
--- DROP FUNCTION dbo.GetRevenueByStaff;
