@@ -1,0 +1,57 @@
+
+INSERT INTO Customer (CustomerID, FirstName, LastName, ContactNumber) VALUES
+(1, N'Nguyễn', N'Văn An', '0987654321'),
+(2, N'Trần', N'Thị Bích', '0976543210'),
+(3, N'Lê', N'Văn Cường', '0965432109'),
+(4, N'Phạm', N'Văn Đức', '0954321098'),
+(5, N'Hoàng', N'Thị Hà', '0943210987');
+INSERT INTO CardType (CardTypeID, CardName, DiscountPercentage) VALUES
+(1, N'Thẻ Vàng', 10.00),
+(2, N'Thẻ Bạc', 5.00),
+(3, N'Thẻ Đồng', 2.00);
+INSERT INTO CustomerCard (CardID, CardTypeID, CustomerID, Balance, Tickets, IssueDate, ExpiryDate, Status) VALUES
+(1, 1, 1, 500000, 20, '2024-01-01', '2025-01-01', N'Active'),
+(2, 2, 2, 300000, 10, '2024-01-15', '2025-01-15', N'Active'),
+(3, 3, 3, 100000, 5, '2024-02-01', '2025-02-01', N'Active'),
+(4, 1, 4, 700000, 30, '2024-02-10', '2025-02-10', N'Active'),
+(5, 2, 5, 200000, 15, '2024-02-20', '2025-02-20', N'Active');
+INSERT INTO Staff (StaffID, FirstName, LastName, IDCardNumber, ContactNumber, RoleID, EmploymentType) VALUES
+(1, N'Nguyễn', N'Minh Hoàng', '123456789', '0901234567', 3, N'Full-time'),
+(2, N'Phạm', N'Thị Mai', '234567890', '0912345678', 3, N'Part-time'),
+(3, N'Trần', N'Hữu Nghĩa', '345678901', '0923456789', 3, N'Full-time');
+INSERT INTO GameMachine (GameMachineID, GameName, CostPerPlay, GameLocation, Status) VALUES
+(1, N'Mario Kart', 5000, N'Khu A', N'Active'),
+(2, N'Pac-Man', 4000, N'Khu B', N'Active'),
+(3, N'Tekken 7', 7000, N'Khu C', N'Under Maintenance'),
+(4, N'Street Fighter', 6000, N'Khu D', N'Active'),
+(5, N'FIFA 2024', 8000, N'Khu E', N'Out of Order');
+INSERT INTO GameTransaction (GameTransactionID, GameMachineID, CardID, AmountDeducted, TicketsEarned, DiscountApplied, StartTime, EndTime, Date) VALUES
+(1, 1, 1, 5000, 2, 10.00, '14:00:00', '14:10:00', '2024-03-01'),
+(2, 2, 2, 4000, 1, 5.00, '15:00:00', '15:08:00', '2024-03-02'),
+(3, 3, 3, 7000, 3, 2.00, '16:00:00', '16:15:00', '2024-03-03'),
+(4, 4, 4, 6000, 4, 10.00, '17:00:00', '17:12:00', '2024-03-04'),
+(5, 5, 5, 8000, 5, 5.00, '18:00:00', '18:20:00', '2024-03-05');
+INSERT INTO DepositTransaction (DepositID, CustomerCardID, CashierID, AmountDeposited, Time, Date) VALUES
+(1, 1, 1, 500000, '10:00:00', '2024-03-01'),
+(2, 2, 2, 300000, '11:00:00', '2024-03-02'),
+(3, 3, 3, 100000, '12:00:00', '2024-03-03'),
+(4, 4, 1, 700000, '13:00:00', '2024-03-04'),
+(5, 5, 2, 200000, '14:00:00', '2024-03-05');
+INSERT INTO Gift (GiftID, GiftName, TicketsCost, Stock) VALUES
+(1, N'Gấu bông Pikachu', 50, 10),
+(2, N'Mô hình Gundam', 100, 5),
+(3, N'Balo Marvel', 75, 7),
+(4, N'Lego City', 120, 4),
+(5, N'Thẻ nạp điện thoại 50k', 50, 15);
+INSERT INTO GiftRedemption (RedemptionID, GiftID, CardID, StaffID, TicketsDeducted, Time, Date) VALUES
+(1, 1, 1, 1, 50, '14:30:00', '2024-03-01'),
+(2, 2, 2, 2, 100, '15:30:00', '2024-03-02'),
+(3, 3, 3, 3, 75, '16:30:00', '2024-03-03'),
+(4, 4, 4, 1, 120, '17:30:00', '2024-03-04'),
+(5, 5, 5, 2, 50, '18:30:00', '2024-03-05');
+INSERT INTO Maintenance (MaintenanceID, GameMachineID, StaffID, Time, Date, TotalCost) VALUES
+(1, 1, 1, '08:00:00', '2024-02-25', 100000),
+(2, 2, 2, '09:00:00', '2024-02-26', 150000),
+(3, 3, 3, '10:00:00', '2024-02-27', 200000),
+(4, 4, 1, '11:00:00', '2024-02-28', 250000),
+(5, 5, 2, '12:00:00', '2024-02-29', 300000);
