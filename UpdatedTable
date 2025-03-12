@@ -100,6 +100,19 @@ CREATE TABLE StockCompensationReceipt (
     FOREIGN KEY (ApprovedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (GameMachineID) REFERENCES GameMachine(GameMachineID)
 );
+CREATE TABLE StockCompensationReceipt (
+    CompensationID INT PRIMARY KEY,
+    IssuedBy NCHAR(50) NOT NULL,
+    ApprovedBy NCHAR(50) NOT NULL,
+    GameMachineID INT NOT NULL,
+    TimeIssued TIME NOT NULL,
+    DateIssued DATE NOT NULL,
+    Reason NVARCHAR(255),
+    FOREIGN KEY (IssuedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ApprovedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (GameMachineID) REFERENCES GameMachine(GameMachineID)
+    FOREIGN KEY (GameMachineID) REFERENCES GameMachine(GameMachineID)
+);
 
 -- Tạo bảng StockCompensationDetail
 CREATE TABLE StockCompensationDetail (
