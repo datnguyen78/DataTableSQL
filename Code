@@ -35,3 +35,51 @@ RETURN
         GameTransaction.Date, 
         GameTransaction.StartTime
 );
+
+--Procedure
+CREATE PROCEDURE GetStaffRevenue
+    @StaffID INT,
+    @StartDate DATE = NULL,
+    @EndDate DATE = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        s.StaffID,
+        CONCAT(s.FirstName, ' ', s.LastName) AS StaffName,
+        COUNT(d.DepositID) AS TotalTransactions,
+        ISNULL(SUM(d.AmountDeposited), 0) AS TotalRevenue
+    FROM Staff s
+    LEFT JOIN DepositTransaction d ON s.StaffID = d.CashierID
+    WHERE s.StaffID = @StaffID
+        AND (@StartDate IS NULL OR @EndDate IS NULL 
+             OR d.Date BETWEEN @StartDate AND @EndDate)
+    GROUP BY s.StaffID, s.FirstName, s.LastName;
+END;
+go
+CREATE PROCEDURE GetCustomerFinancialSummary
+    @CustomerID INT,
+    @StartDate DATE = NULL,
+    @EndDate DATE = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        c.CustomerID,
+        CONCAT(c.FirstName, ' ', c.LastName) AS CustomerName,
+        ISNULL(SUM(d.AmountDeposited), 0) AS TotalDeposit,
+        ISNULL(SUM(g.AmountDeducted), 0) AS TotalSpent,
+        ISNULL(SUM(d.AmountDeposited), 0) - ISNULL(SUM(g.AmountDeducted), 0) AS RemainingBalance
+    FROM Customer c
+    LEFT JOIN CustomerCard cc ON c.CustomerID = cc.CustomerID
+    LEFT JOIN DepositTransaction d ON cc.CardID = d.CustomerCardID
+    LEFT JOIN GameTransaction g ON cc.CardID = g.CardID
+    WHERE c.CustomerID = @CustomerID
+        AND (@StartDate IS NULL OR @EndDate IS NULL 
+             OR d.Date BETWEEN @StartDate AND @EndDate
+             OR g.Date BETWEEN @StartDate AND @EndDate)
+    GROUP BY c.CustomerID, c.FirstName, c.LastName;
+END;
+
