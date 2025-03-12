@@ -1,0 +1,31 @@
+CREATE VIEW v_StockCompensationSummary AS
+SELECT CompensationID, COUNT(Quantity) AS TotalQuantity
+FROM dbo.StockCompensationDetail
+GROUP BY CompensationID;
+go
+CREATE VIEW v_ProductWithGroup AS
+SELECT 
+    Product.GroupID, 
+    ProductGroup.GroupName, 
+    ProductGroup.ProductType, 
+    Product.Name AS ProductName
+FROM dbo.Product
+INNER JOIN dbo.ProductGroup ON Product.GroupID = ProductGroup.GroupID;
+go
+CREATE VIEW v_StockCompensationReport AS
+SELECT 
+    StockCompensationReceipt.CompensationID, 
+    v_StockCompensationSummary.TotalQuantity, 
+    v_ProductWithGroup.GroupID, 
+    v_ProductWithGroup.GroupName, 
+    v_ProductWithGroup.ProductType, 
+    v_ProductWithGroup.ProductName, 
+    StockCompensationReceipt.IssuedBy, 
+    StockCompensationReceipt.ApprovedBy, 
+    StockCompensationReceipt.TimeIssued, 
+    StockCompensationReceipt.DateIssued, 
+    StockCompensationReceipt.Reason
+FROM dbo.StockCompensationReceipt
+INNER JOIN v_StockCompensationSummary ON StockCompensationReceipt.CompensationID = v_StockCompensationSummary.CompensationID
+INNER JOIN v_ProductWithGroup ON StockCompensationReceipt.CompensationID = v_ProductWithGroup.GroupID;
+
