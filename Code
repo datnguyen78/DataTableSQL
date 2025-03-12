@@ -46,19 +46,20 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT 
-        s.StaffID,
-        CONCAT(s.FirstName, ' ', s.LastName) AS StaffName,
-        COUNT(d.DepositID) AS TotalTransactions,
-        ISNULL(SUM(d.AmountDeposited), 0) AS TotalRevenue
-    FROM Staff s
-    LEFT JOIN DepositTransaction d ON s.StaffID = d.CashierID
-    WHERE s.StaffID = @StaffID
+        Staff.StaffID,
+        Staff.FirstName + ' ' + Staff.LastName AS StaffName,
+        COUNT(DepositTransaction.DepositID) AS TotalTransactions,
+        ISNULL(SUM(DepositTransaction.AmountDeposited), 0) AS TotalRevenue
+    FROM Staff
+    LEFT JOIN DepositTransaction ON Staff.StaffID = DepositTransaction.CashierID
+    WHERE Staff.StaffID = @StaffID
         AND (@StartDate IS NULL OR @EndDate IS NULL 
-             OR d.Date BETWEEN @StartDate AND @EndDate)
-    GROUP BY s.StaffID, s.FirstName, s.LastName;
+             OR DepositTransaction.Date BETWEEN @StartDate AND @EndDate)
+    GROUP BY Staff.StaffID, Staff.FirstName, Staff.LastName;
 END;
-go
-CREATE PROCEDURE GetCustomerFinancialSummary
+
+--Customer
+alter PROCEDURE GetCustomerFinancialSummary
     @CustomerID INT,
     @StartDate DATE = NULL,
     @EndDate DATE = NULL
@@ -66,20 +67,44 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Lấy chi tiết từng giao dịch nạp tiền và chơi game của khách hàng
     SELECT 
-        c.CustomerID,
-        CONCAT(c.FirstName, ' ', c.LastName) AS CustomerName,
-        ISNULL(SUM(d.AmountDeposited), 0) AS TotalDeposit,
-        ISNULL(SUM(g.AmountDeducted), 0) AS TotalSpent,
-        ISNULL(SUM(d.AmountDeposited), 0) - ISNULL(SUM(g.AmountDeducted), 0) AS RemainingBalance
-    FROM Customer c
-    LEFT JOIN CustomerCard cc ON c.CustomerID = cc.CustomerID
-    LEFT JOIN DepositTransaction d ON cc.CardID = d.CustomerCardID
-    LEFT JOIN GameTransaction g ON cc.CardID = g.CardID
-    WHERE c.CustomerID = @CustomerID
-        AND (@StartDate IS NULL OR @EndDate IS NULL 
-             OR d.Date BETWEEN @StartDate AND @EndDate
-             OR g.Date BETWEEN @StartDate AND @EndDate)
-    GROUP BY c.CustomerID, c.FirstName, c.LastName;
-END;
+        Customer.CustomerID,
+        CONCAT(FirstName, ' ', LastName) AS CustomerName,
+        AmountDeposited AS DepositAmount,
+        AmountDeducted AS SpentAmount,
+        DepositTransaction.Date AS DepositDate,
+        GameTransaction.Date AS SpentDate,
+        DepositTransaction.Time AS DepositTime,
+        GameTransaction.StartTime AS SpentTime,
+        
+        -- Tính tổng tiền nạp của khách hàng trong khoảng thời gian đã chọn
+        (SELECT SUM(AmountDeposited) 
+         FROM DepositTransaction 
+         WHERE CustomerCardID = CustomerCard.CardID
+           AND (@StartDate IS NULL OR Date BETWEEN @StartDate AND @EndDate)
+        ) AS TotalDeposit,
+        
+        -- Tính tổng tiền đã chơi của khách hàng trong khoảng thời gian đã chọn
+        (SELECT SUM(AmountDeducted) 
+         FROM GameTransaction 
+         WHERE CardID = CustomerCard.CardID
+           AND (@StartDate IS NULL OR Date BETWEEN @StartDate AND @EndDate)
+        ) AS TotalSpent
 
+    FROM Customer
+    LEFT JOIN CustomerCard ON Customer.CustomerID = CustomerCard.CustomerID
+    LEFT JOIN DepositTransaction ON CustomerCard.CardID = DepositTransaction.CustomerCardID
+    LEFT JOIN GameTransaction ON CustomerCard.CardID = GameTransaction.CardID
+
+    WHERE Customer.CustomerID = @CustomerID
+      AND (@StartDate IS NULL OR DepositTransaction.Date BETWEEN @StartDate AND @EndDate
+                         OR GameTransaction.Date BETWEEN @StartDate AND @EndDate)
+
+    -- Sắp xếp theo ngày giao dịch
+    ORDER BY COALESCE(DepositTransaction.Date, GameTransaction.Date), 
+             COALESCE(DepositTransaction.Time, GameTransaction.StartTime);
+END;
+go
+--Usage
+EXEC GetCustomerFinancialSummary @CustomerID = 5, @StartDate = '2022-03-01', @EndDate = '2025-03-31';
