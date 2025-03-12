@@ -114,3 +114,17 @@ FROM            dbo.StockReceipt INNER JOIN
                              (SELECT        ReceiptID, COUNT(Quantity) AS SL
                                FROM            dbo.StockReceiptDetail
                                GROUP BY ReceiptID) AS TK ON dbo.StockReceipt.ReceiptID = TK.ReceiptID
+
+--PhieuXuat
+
+SELECT        derivedtbl_1.CompensationID, derivedtbl_2.GroupID, derivedtbl_2.GroupName, derivedtbl_2.ProductType, derivedtbl_2.ProductName, dbo.StockCompensationReceipt.IssuedBy, dbo.StockCompensationReceipt.ApprovedBy, 
+                         dbo.StockCompensationReceipt.TimeIssued, dbo.StockCompensationReceipt.DateIssued, derivedtbl_1.SL, dbo.StockCompensationReceipt.Reason
+FROM            dbo.StockCompensationReceipt INNER JOIN
+                             (SELECT        CompensationID, COUNT(Quantity) AS SL
+                               FROM            dbo.StockCompensationDetail
+                               GROUP BY CompensationID) AS derivedtbl_1 ON dbo.StockCompensationReceipt.CompensationID = derivedtbl_1.CompensationID CROSS JOIN
+                             (SELECT        dbo.Product.GroupID, derivedtbl_1_1.GroupName, derivedtbl_1_1.ProductType, dbo.Product.Name AS ProductName
+                               FROM            dbo.Product INNER JOIN
+                                                             (SELECT        GroupID, GroupName, ProductType
+                                                               FROM            dbo.ProductGroup
+                                                               GROUP BY GroupID, GroupName, ProductType) AS derivedtbl_1_1 ON dbo.Product.GroupID = derivedtbl_1_1.GroupID) AS derivedtbl_2
