@@ -108,3 +108,9 @@ END;
 go
 --Usage
 EXEC GetCustomerFinancialSummary @CustomerID = 5, @StartDate = '2022-03-01', @EndDate = '2025-03-31';
+--PhieuNhap
+SELECT        dbo.StockReceipt.ReceiptID, dbo.StockReceipt.ReceiptDate, TK.SL
+FROM            dbo.StockReceipt INNER JOIN
+                             (SELECT        ReceiptID, COUNT(Quantity) AS SL
+                               FROM            dbo.StockReceiptDetail
+                               GROUP BY ReceiptID) AS TK ON dbo.StockReceipt.ReceiptID = TK.ReceiptID
