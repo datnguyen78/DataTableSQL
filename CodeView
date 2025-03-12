@@ -29,3 +29,8 @@ FROM dbo.StockCompensationReceipt
 INNER JOIN v_StockCompensationSummary ON StockCompensationReceipt.CompensationID = v_StockCompensationSummary.CompensationID
 INNER JOIN v_ProductWithGroup ON StockCompensationReceipt.CompensationID = v_ProductWithGroup.GroupID;
 
+--usage
+SELECT * FROM v_StockCompensationReport;
+--or
+SELECT * FROM v_StockCompensationReport WHERE DateIssued >= '2025-01-01';
+
