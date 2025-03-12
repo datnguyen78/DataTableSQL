@@ -15,8 +15,6 @@ go
 CREATE VIEW v_StockCompensationReport AS
 SELECT 
     StockCompensationReceipt.CompensationID, 
-    v_StockCompensationSummary.TotalQuantity, 
-    v_ProductWithGroup.GroupID, 
     v_ProductWithGroup.GroupName, 
     v_ProductWithGroup.ProductType, 
     v_ProductWithGroup.ProductName, 
@@ -24,6 +22,7 @@ SELECT
     StockCompensationReceipt.ApprovedBy, 
     StockCompensationReceipt.TimeIssued, 
     StockCompensationReceipt.DateIssued, 
+	v_StockCompensationSummary.TotalQuantity,
     StockCompensationReceipt.Reason
 FROM dbo.StockCompensationReceipt
 INNER JOIN v_StockCompensationSummary ON StockCompensationReceipt.CompensationID = v_StockCompensationSummary.CompensationID
