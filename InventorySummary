@@ -1,0 +1,62 @@
+CREATE TABLE InventorySummary (
+    ProductID INT PRIMARY KEY,
+    BeginningStock INT NOT NULL DEFAULT 0,
+    IncomingStock INT NOT NULL DEFAULT 0,
+    OutgoingStock INT NOT NULL DEFAULT 0,
+    EndingStock AS (BeginningStock + IncomingStock - OutgoingStock) PERSISTED,
+    LastUpdated DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+);
+CREATE TRIGGER trg_UpdateIncomingStock
+ON StockReceiptDetail
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE InventorySummary
+    SET 
+        IncomingStock = IncomingStock + i.Quantity,
+        LastUpdated = GETDATE()
+    FROM InventorySummary inv
+    INNER JOIN inserted i ON inv.ProductID = i.ProductID;
+
+    -- If product does not exist in InventorySummary, insert it
+    INSERT INTO InventorySummary (ProductID, IncomingStock, LastUpdated)
+    SELECT i.ProductID, i.Quantity, GETDATE()
+    FROM inserted i
+    WHERE NOT EXISTS (SELECT 1 FROM InventorySummary inv WHERE inv.ProductID = i.ProductID);
+END;
+CREATE TRIGGER trg_UpdateOutgoingStock
+ON StockCompensationDetail
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE InventorySummary
+    SET 
+        OutgoingStock = OutgoingStock + i.Quantity,
+        LastUpdated = GETDATE()
+    FROM InventorySummary inv
+    INNER JOIN inserted i ON inv.ProductID = i.ProductID;
+
+    -- If product does not exist in InventorySummary, insert it
+    INSERT INTO InventorySummary (ProductID, OutgoingStock, LastUpdated)
+    SELECT i.ProductID, i.Quantity, GETDATE()
+    FROM inserted i
+    WHERE NOT EXISTS (SELECT 1 FROM InventorySummary inv WHERE inv.ProductID = i.ProductID);
+END;
+CREATE TRIGGER trg_UpdateBeginningStock
+ON StockReceipt
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE InventorySummary
+    SET 
+        BeginningStock = EndingStock,
+        LastUpdated = GETDATE()
+    FROM InventorySummary;
+END;
